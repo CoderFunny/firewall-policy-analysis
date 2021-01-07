@@ -284,12 +284,6 @@ def mergeCondition(fl, slist):
     # print(int(fl['源端口']) >= 1000)
     # print(int(sl['源端口']) >= 1000)
     # print('\n')
-    if isinstance(slist, dict):
-        sl = slist
-        if fl['源VRF'] + fl['源网段'] + fl['目的VRF'] + fl['目的网段'] + fl['目的端口'] + fl['映射协议'] == \
-                sl['源VRF'] + sl['源网段'] + sl['目的VRF'] + sl['目的网段'] + sl['目的端口'] + sl['映射协议'] and \
-                int(fl['源端口']) >= 1000 and int(sl['源端口']) >= 1000:
-            result = True
     if isinstance(slist, list) and len(slist):
         for sl in slist:
             if fl['源VRF'] + fl['源网段'] + fl['目的VRF'] + fl['目的网段'] + fl['目的端口'] + fl['映射协议'] == \
@@ -504,29 +498,18 @@ def SetFont(type):
     return style
 
 
-def writeSheet(sheet, resultList):
+def writeSheet(sheet, tableMeaning, resultList):
+    headerDict = ['源VRF(实际)', '源网段(实际)', '源端口(实际)', '目的VRF(实际)', '目的网段(实际)', '目的端口(实际)', '协议(实际)', '映射协议',
+                  '源VRF(标准)', '源网段(标准)', '源端口(标准)', '目的VRF(标准)', '目的网段(标准)', '目的端口(标准)', '协议(标准)', '分析结果']
     headFont = SetFont(1)
     bodyFont1 = SetFont(4)  # 水平垂直居中light_green
     bodyFont2 = SetFont(5)  # 水平垂直居中sky_blue
     bodyFont3 = SetFont(6)  # 水平垂直居中light_yellow
     bodyFont6 = SetFont(7)  # 水平垂直居中不换行light_green
     bodyFont7 = SetFont(8)  # 水平垂直居中不换行sky_blue
-    sheet.write(0, 0, '源VRF(实际)', headFont)
-    sheet.write(0, 1, '源网段(实际)', headFont)
-    sheet.write(0, 2, '源端口(实际)', headFont)
-    sheet.write(0, 3, '目的VRF(实际)', headFont)
-    sheet.write(0, 4, '目的网段(实际)', headFont)
-    sheet.write(0, 5, '目的端口(实际)', headFont)
-    sheet.write(0, 6, '协议(实际)', headFont)
-    sheet.write(0, 7, '映射协议', headFont)
-    sheet.write(0, 8, '源VRF(标准)', headFont)
-    sheet.write(0, 9, '源网段(标准)', headFont)
-    sheet.write(0, 10, '源端口(标准)', headFont)
-    sheet.write(0, 11, '目的VRF(标准)', headFont)
-    sheet.write(0, 12, '目的网段(标准)', headFont)
-    sheet.write(0, 13, '目的端口(标准)', headFont)
-    sheet.write(0, 14, '协议(标准)', headFont)
-    sheet.write(0, 15, '分析结果', headFont)
+    sheet.write_merge(0, 0, 0, len(headerDict) - 1, tableMeaning, headFont)
+    for i in range(len(headerDict)):
+        sheet.write(1, i, headerDict[i], headFont)
 
     sheet.col(1).width = 256 * 13
     sheet.col(4).width = 256 * 13
@@ -534,7 +517,7 @@ def writeSheet(sheet, resultList):
     sheet.col(12).width = 256 * 15
     sheet.col(13).width = 256 * 26
     # 数据写入
-    shtNum1 = 1
+    shtNum1 = 2
     if len(resultList):
         for matchData in resultList:
             if len(matchData) == 15:
@@ -583,86 +566,9 @@ def XLSWrite(XLSPath, FPDict):
     xls = xlwt.Workbook()
     # 实例化一个工作表，名叫Sheet1
     sht1 = xls.add_sheet(u'防火墙配置策略分析结果')
-    sht2 = xls.add_sheet(u'防火墙配置策略分析结果2')
-    writeSheet(sht1, FPDict['initialResult'])
-    writeSheet(sht2, FPDict['mergeResult'])
-    # writeSheet(sht3, FPDict['tmp'])
-    # # 第一个参数是行，第二个参数是列，第三个参数是值,第四个参数是格式
-    # headFont = SetFont(1)
-    # bodyFont1 = SetFont(4)  # 水平垂直居中light_green
-    # bodyFont2 = SetFont(5)  # 水平垂直居中sky_blue
-    # bodyFont3 = SetFont(6)  # 水平垂直居中light_yellow
-    # bodyFont4 = SetFont(2)
-    # bodyFont5 = SetFont(3)
-    # bodyFont6 = SetFont(7)  # 水平垂直居中不换行light_green
-    # bodyFont7 = SetFont(8)  # 水平垂直居中不换行sky_blue
-    # sht1.write(0, 0, '源VRF(实际)', headFont)
-    # sht1.write(0, 1, '源网段(实际)', headFont)
-    # sht1.write(0, 2, '源端口(实际)', headFont)
-    # sht1.write(0, 3, '目的VRF(实际)', headFont)
-    # sht1.write(0, 4, '目的网段(实际)', headFont)
-    # sht1.write(0, 5, '目的端口(实际)', headFont)
-    # sht1.write(0, 6, '协议(实际)', headFont)
-    # sht1.write(0, 7, '映射协议', headFont)
-    # sht1.write(0, 8, '源VRF(标准)', headFont)
-    # sht1.write(0, 9, '源网段(标准)', headFont)
-    # sht1.write(0, 10, '源端口(标准)', headFont)
-    # sht1.write(0, 11, '目的VRF(标准)', headFont)
-    # sht1.write(0, 12, '目的网段(标准)', headFont)
-    # sht1.write(0, 13, '目的端口(标准)', headFont)
-    # sht1.write(0, 14, '协议(标准)', headFont)
-    # sht1.write(0, 15, '分析结果', headFont)
-    #
-    # # 数据写入
-    # # sheet1
-    # shtNum1 = 1
-    # if len(FPDict['matchTxt']):
-    #     matchTxtList = FPDict['matchTxt']
-    #
-    #     sht1.col(1).width = 256 * 13
-    #     sht1.col(4).width = 256 * 13
-    #     sht1.col(9).width = 256 * 15
-    #     sht1.col(12).width = 256 * 15
-    #     sht1.col(13).width = 256 * 26
-    #     for matchData in matchTxtList:
-    #         sht1.write(shtNum1, 0, matchData['源VRF'], bodyFont1)
-    #         sht1.write(shtNum1, 1, matchData['源网段'], bodyFont1)
-    #         sht1.write(shtNum1, 2, matchData['源端口'], bodyFont6)
-    #         sht1.write(shtNum1, 3, matchData['目的VRF'], bodyFont1)
-    #         sht1.write(shtNum1, 4, matchData['目的网段'], bodyFont1)
-    #         sht1.write(shtNum1, 5, matchData['目的端口'], bodyFont6)
-    #         sht1.write(shtNum1, 6, matchData['协议'], bodyFont1)
-    #         sht1.write(shtNum1, 7, matchData['映射协议'], bodyFont1)
-    #
-    #         sht1.write(shtNum1, 8, matchData['源VRF(标准)'], bodyFont2)
-    #         sht1.write(shtNum1, 9, '\n'.join(matchData['源网段(标准)']), bodyFont2)
-    #         sht1.write(shtNum1, 10, matchData['源端口(标准)'], bodyFont7)
-    #         sht1.write(shtNum1, 11, matchData['目的VRF(标准)'], bodyFont2)
-    #         sht1.write(shtNum1, 12, '\n'.join(matchData['目的网段(标准)']), bodyFont2)
-    #         if isinstance(matchData['目的端口(标准)'][0], str):
-    #             sht1.write(shtNum1, 13, matchData['目的端口(标准)'], bodyFont7)
-    #         else:
-    #             strtmp = ''
-    #             for dic in matchData['目的端口(标准)']:
-    #                 for key in dic:
-    #                     strtmp = strtmp + key + ':' + dic[key] + '\n'
-    #             sht1.write(shtNum1, 13, strtmp, bodyFont2)
-    #         sht1.write(shtNum1, 14, '\n'.join(matchData['协议(标准)']), bodyFont2)
-    #         sht1.write(shtNum1, 15, 'PASS', bodyFont3)
-    #         shtNum1 = shtNum1 + 1
-    #
-    # if len(FPDict['mismatch']):
-    #     mismatchList = FPDict['mismatch']
-    #     for mismatchData in mismatchList:
-    #         sht1.write(shtNum1, 0, mismatchData['源VRF'], bodyFont1)
-    #         sht1.write(shtNum1, 1, mismatchData['源网段'], bodyFont1)
-    #         sht1.write(shtNum1, 2, mismatchData['源端口'], bodyFont6)
-    #         sht1.write(shtNum1, 3, mismatchData['目的VRF'], bodyFont1)
-    #         sht1.write(shtNum1, 4, mismatchData['目的网段'], bodyFont1)
-    #         sht1.write(shtNum1, 5, mismatchData['目的端口'], bodyFont6)
-    #         sht1.write(shtNum1, 6, mismatchData['协议'], bodyFont1)
-    #         sht1.write(shtNum1, 7, mismatchData['映射协议'], bodyFont1)
-    #         shtNum1 = shtNum1 + 1
+    sht2 = xls.add_sheet(u'防火墙配置策略去重结果')
+    writeSheet(sht1, '防火墙配置策略分析结果', FPDict['initialResult'])
+    writeSheet(sht2, '防火墙配置策略去重结果(去重策略:实际数据中，源端口号大于1000的，且其他六项数据均相同的去重，将源端口号改为1-65535)', FPDict['mergeResult'])
     xls.save(XLSPath)
     logging.info('xls write end')
 
